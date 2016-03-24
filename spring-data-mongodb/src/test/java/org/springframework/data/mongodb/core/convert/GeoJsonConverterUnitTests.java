@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,11 +71,18 @@ public class GeoJsonConverterUnitTests {
 	static final Point POINT_2 = new Point(100, 100);
 	static final Point POINT_3 = new Point(0, 100);
 
+	static final Point INNER_POINT_0 = new Point(10, 10);
+	static final Point INNER_POINT_1 = new Point(90, 10);
+	static final Point INNER_POINT_2 = new Point(90, 90);
+	static final Point INNER_POINT_3 = new Point(10, 90);
+
 	static final GeoJsonMultiPoint MULTI_POINT = new GeoJsonMultiPoint(POINT_0, POINT_2, POINT_3);
 	static final GeoJsonLineString LINE_STRING = new GeoJsonLineString(POINT_0, POINT_1, POINT_2);
 	@SuppressWarnings("unchecked") static final GeoJsonMultiLineString MULTI_LINE_STRING = new GeoJsonMultiLineString(
 			Arrays.asList(POINT_0, POINT_1, POINT_2), Arrays.asList(POINT_3, POINT_0));
 	static final GeoJsonPolygon POLYGON = new GeoJsonPolygon(POINT_0, POINT_1, POINT_2, POINT_3, POINT_0);
+	static final GeoJsonPolygon POLYGON_WITH_2_RINGS = POLYGON.withInnerRing(INNER_POINT_0, INNER_POINT_1, INNER_POINT_2,
+			INNER_POINT_3, INNER_POINT_0);
 	static final GeoJsonMultiPolygon MULTI_POLYGON = new GeoJsonMultiPolygon(Arrays.asList(POLYGON));
 	static final GeoJsonGeometryCollection GEOMETRY_COLLECTION = new GeoJsonGeometryCollection(
 			Arrays.<GeoJson<?>> asList(SINGLE_POINT, POLYGON));
@@ -110,10 +117,25 @@ public class GeoJsonConverterUnitTests {
 			.add(new BasicDbListBuilder().add(POINT_3.getX()).add(POINT_3.getY()).get()) //
 			.add(new BasicDbListBuilder().add(POINT_0.getX()).add(POINT_0.getY()).get()) //
 			.get();
+
+	static final BasicDBList POLYGON_INNER_CORDS = new BasicDbListBuilder() //
+			.add(new BasicDbListBuilder().add(INNER_POINT_0.getX()).add(INNER_POINT_0.getY()).get()) //
+			.add(new BasicDbListBuilder().add(INNER_POINT_1.getX()).add(INNER_POINT_1.getY()).get()) //
+			.add(new BasicDbListBuilder().add(INNER_POINT_2.getX()).add(INNER_POINT_2.getY()).get()) //
+			.add(new BasicDbListBuilder().add(INNER_POINT_3.getX()).add(INNER_POINT_3.getY()).get()) //
+			.add(new BasicDbListBuilder().add(INNER_POINT_0.getX()).add(INNER_POINT_0.getY()).get()) //
+			.get();
+
 	static final BasicDBList POLYGON_CORDS = new BasicDbListBuilder().add(POLYGON_OUTER_CORDS).get();
 	static final Document POLYGON_DBO = new Document() //
 			.append("type", "Polygon") //
 			.append("coordinates", POLYGON_CORDS); //
+
+	static final BasicDBList POLYGON_WITH_2_RINGS_CORDS = new BasicDbListBuilder().add(POLYGON_OUTER_CORDS)
+			.add(POLYGON_INNER_CORDS).get();
+	static final Document POLYGON_WITH_2_RINGS_DBO = new Document() //
+			.append("type", "Polygon") //
+			.append("coordinates", POLYGON_WITH_2_RINGS_CORDS);
 
 	// LineString
 	static final BasicDBList LINE_STRING_CORDS_0 = new BasicDbListBuilder() //
@@ -183,6 +205,14 @@ public class GeoJsonConverterUnitTests {
 			expectedException.expectMessage("'YouDontKonwMe' to Polygon");
 
 			converter.convert(new Document("type", "YouDontKonwMe"));
+		}
+
+		/**
+		 * @see DATAMONGO-1399
+		 */
+		@Test
+		public void shouldConvertDboWithMultipleRingsCorrectly() {
+			assertThat(converter.convert(POLYGON_WITH_2_RINGS_DBO), equalTo(POLYGON_WITH_2_RINGS));
 		}
 
 	}
@@ -440,6 +470,14 @@ public class GeoJsonConverterUnitTests {
 		@Test
 		public void shouldConvertGeometryCollectionCorrectly() {
 			assertThat(converter.convert(GEOMETRY_COLLECTION), equalTo(GEOMETRY_COLLECTION_DBO));
+		}
+
+		/**
+		 * @see DATAMONGO-1399
+		 */
+		@Test
+		public void shouldConvertGeoJsonPolygonWithMultipleRingsCorrectly() {
+			assertThat(converter.convert(POLYGON_WITH_2_RINGS), equalTo(POLYGON_WITH_2_RINGS_DBO));
 		}
 	}
 }

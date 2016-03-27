@@ -490,4 +490,94 @@ public class UpdateTests {
 		assertThat(pullAll.get("field1"), is(notNullValue()));
 		assertThat(pullAll.get("field2"), is(notNullValue()));
 	}
+
+	/**
+	 * @see DATAMONGO-1404
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void maxShouldThrowExceptionForNullMultiplier() {
+		new Update().max("key", null);
+	}
+
+	/**
+	 * @see DATAMONGO-1404
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void minShouldThrowExceptionForNullMultiplier() {
+		new Update().min("key", null);
+	}
+
+	/**
+	 * @see DATAMONGO-1404
+	 */
+	@Test
+	public void getUpdateObjectShouldReturnCorrectRepresentationForMax() {
+
+		Update update = new Update().max("key", 10);
+
+		assertThat(update.getUpdateObject(), equalTo(new Document().append("$max", new Document("key", 10))));
+	}
+
+	/**
+	 * @see DATAMONGO-1404
+	 */
+	@Test
+	public void getUpdateObjectShouldReturnCorrectRepresentationForMin() {
+
+		Update update = new Update().min("key", 10);
+
+		assertThat(update.getUpdateObject(), equalTo(new Document().append("$min", new Document("key", 10))));
+	}
+
+	/**
+	 * @see DATAMONGO-1404
+	 */
+	@Test
+	public void shouldSuppressPreviousValueForMax() {
+
+		Update update = new Update().max("key", 10);
+
+		update.max("key", 99);
+
+		assertThat(update.getUpdateObject(), equalTo(new Document().append("$max", new Document("key", 99))));
+	}
+
+	/**
+	 * @see DATAMONGO-1404
+	 */
+	@Test
+	public void shouldSuppressPreviousValueForMin() {
+
+		Update update = new Update().min("key", 10);
+
+		update.max("key", 99);
+
+		assertThat(update.getUpdateObject(), equalTo(new Document().append("$min9", new Document("key", 99))));
+	}
+
+	/**
+	 * @see DATAMONGO-1404
+	 */
+	@Test
+	public void getUpdateObjectShouldReturnCorrectDateRepresentationForMax() {
+
+		final java.util.Date date = new java.util.Date();
+
+		Update update = new Update().max("key", date);
+
+		assertThat(update.getUpdateObject(), equalTo(new Document().append("$max", new Document("key", date))));
+	}
+
+	/**
+	 * @see DATAMONGO-1404
+	 */
+	@Test
+	public void getUpdateObjectShouldReturnCorrectDateRepresentationForMin() {
+
+		final java.util.Date date = new java.util.Date();
+
+		Update update = new Update().min("key", date);
+
+		assertThat(update.getUpdateObject(), equalTo(new Document().append("$min", new Document("key", date))));
+	}
 }

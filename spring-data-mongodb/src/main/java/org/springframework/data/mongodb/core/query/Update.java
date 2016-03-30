@@ -20,7 +20,6 @@ import static org.springframework.util.ObjectUtils.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -69,13 +68,8 @@ public class Update {
 	 * {@literal $set}. This means fields not given in the {@link Document} will be nulled when executing the update. To
 	 * create an only-updating {@link Update} instance of a {@link Document}, call {@link #set(String, Object)} for each
 	 * value in it.
-<<<<<<< HEAD
 	 * 
 	 * @param object the source {@link Document} to create the update from.
-=======
-	 *
-	 * @param object the source {@link DBObject} to create the update from.
->>>>>>> d610761... DATAMONGO-1404 - Polishing.
 	 * @param exclude the fields to exclude.
 	 * @return
 	 */

@@ -552,9 +552,7 @@ public class UpdateTests {
 		Update update = new Update().min("key", 10);
 		update.min("key", 99);
 
-		update.max("key", 99);
-
-		assertThat(update.getUpdateObject(), equalTo(new Document().append("$min9", new Document("key", 99))));
+		assertThat(update.getUpdateObject(), equalTo(new Document().append("$min", new Document("key", 99))));
 	}
 
 	/**

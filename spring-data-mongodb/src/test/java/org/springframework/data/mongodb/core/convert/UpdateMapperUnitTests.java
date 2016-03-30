@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,10 +58,11 @@ import com.mongodb.DBRef;
 
 /**
  * Unit tests for {@link UpdateMapper}.
- * 
+ *
  * @author Oliver Gierke
  * @author Christoph Strobl
  * @author Thomas Darimont
+ * @author Mark Paluch
  */
 @RunWith(MockitoJUnitRunner.class)
 public class UpdateMapperUnitTests {
@@ -878,6 +879,32 @@ public class UpdateMapperUnitTests {
 
 		Document $set = DBObjectTestUtils.getAsDocument(mappedUpdate, "$set");
 		assertThat($set.get("primIntValue"), Is.<Object> is(10));
+	}
+
+	/**
+	 * @see DATAMONGO-1404
+	 */
+	@Test
+	public void mapsMinCorrectly() {
+
+		Update update = new Update().min("minfield", 10);
+		Document mappedUpdate = mapper.getMappedObject(update.getUpdateObject(),
+				context.getPersistentEntity(SimpleValueHolder.class));
+
+		assertThat(mappedUpdate, isBsonObject().containing("$min", new Document("minfield", 10)));
+	}
+
+	/**
+	 * @see DATAMONGO-1404
+	 */
+	@Test
+	public void mapsMaxCorrectly() {
+
+		Update update = new Update().max("maxfield", 999);
+		Document mappedUpdate = mapper.getMappedObject(update.getUpdateObject(),
+				context.getPersistentEntity(SimpleValueHolder.class));
+
+		assertThat(mappedUpdate, isBsonObject().containing("$max", new Document("maxfield", 999)));
 	}
 
 	static class DomainTypeWrappingConcreteyTypeHavingListOfInterfaceTypeAttributes {

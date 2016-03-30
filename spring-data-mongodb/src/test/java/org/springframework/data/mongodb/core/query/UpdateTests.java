@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 the original author or authors.
+ * Copyright 2010-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 
 import org.bson.Document;
@@ -28,12 +29,13 @@ import org.springframework.data.mongodb.core.DBObjectTestUtils;
 
 /**
  * Test cases for {@link Update}.
- * 
+ *
  * @author Oliver Gierke
  * @author Thomas Risberg
  * @author Becca Gaspard
  * @author Christoph Strobl
  * @author Thomas Darimont
+ * @author Alexey Plotnik
  */
 public class UpdateTests {
 
@@ -536,7 +538,6 @@ public class UpdateTests {
 	public void shouldSuppressPreviousValueForMax() {
 
 		Update update = new Update().max("key", 10);
-
 		update.max("key", 99);
 
 		assertThat(update.getUpdateObject(), equalTo(new Document().append("$max", new Document("key", 99))));
@@ -549,6 +550,7 @@ public class UpdateTests {
 	public void shouldSuppressPreviousValueForMin() {
 
 		Update update = new Update().min("key", 10);
+		update.min("key", 99);
 
 		update.max("key", 99);
 
@@ -561,8 +563,7 @@ public class UpdateTests {
 	@Test
 	public void getUpdateObjectShouldReturnCorrectDateRepresentationForMax() {
 
-		final java.util.Date date = new java.util.Date();
-
+		Date date = new Date();
 		Update update = new Update().max("key", date);
 
 		assertThat(update.getUpdateObject(), equalTo(new Document().append("$max", new Document("key", date))));
@@ -574,8 +575,7 @@ public class UpdateTests {
 	@Test
 	public void getUpdateObjectShouldReturnCorrectDateRepresentationForMin() {
 
-		final java.util.Date date = new java.util.Date();
-
+		Date date = new Date();
 		Update update = new Update().min("key", date);
 
 		assertThat(update.getUpdateObject(), equalTo(new Document().append("$min", new Document("key", date))));

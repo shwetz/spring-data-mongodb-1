@@ -33,7 +33,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.mongodb.CommandResult;
+import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.ServerAddress;
 
@@ -53,10 +53,8 @@ public class MongoNamespaceReplicaSetTests {
 		List<ServerAddress> replicaSetSeeds = (List<ServerAddress>) ReflectionTestUtils.getField(mfb, "replicaSetSeeds");
 
 		assertThat(replicaSetSeeds, is(notNullValue()));
-		assertThat(
-				replicaSetSeeds,
-				hasItems(new ServerAddress(InetAddress.getByName("127.0.0.1"), 10001),
-						new ServerAddress(InetAddress.getByName("localhost"), 10002)));
+		assertThat(replicaSetSeeds, hasItems(new ServerAddress(InetAddress.getByName("127.0.0.1"), 10001),
+				new ServerAddress(InetAddress.getByName("localhost"), 10002)));
 	}
 
 	@Test
@@ -70,10 +68,8 @@ public class MongoNamespaceReplicaSetTests {
 
 		assertThat(replicaSetSeeds, is(notNullValue()));
 		assertThat(replicaSetSeeds, hasSize(3));
-		assertThat(
-				replicaSetSeeds,
-				hasItems(new ServerAddress("192.168.174.130", 27017), new ServerAddress("192.168.174.130", 27018),
-						new ServerAddress("192.168.174.130", 27019)));
+		assertThat(replicaSetSeeds, hasItems(new ServerAddress("192.168.174.130", 27017),
+				new ServerAddress("192.168.174.130", 27018), new ServerAddress("192.168.174.130", 27019)));
 	}
 
 	@Test
@@ -89,7 +85,7 @@ public class MongoNamespaceReplicaSetTests {
 		assertEquals(10002, servers.get(1).getPort());
 
 		MongoTemplate template = new MongoTemplate(mongo, "admin");
-		CommandResult result = template.executeCommand("{replSetGetStatus : 1}");
-		assertEquals("blort", result.getString("set"));
+		DBObject result = template.executeCommand("{replSetGetStatus : 1}");
+		assertEquals("blort", result.get("set").toString());
 	}
 }

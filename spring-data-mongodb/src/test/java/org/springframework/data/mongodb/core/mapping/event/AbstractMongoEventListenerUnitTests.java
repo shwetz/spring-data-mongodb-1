@@ -18,15 +18,13 @@ package org.springframework.data.mongodb.core.mapping.event;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import org.bson.Document;
 import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.data.mongodb.core.mapping.Account;
 import org.springframework.data.mongodb.repository.Contact;
 import org.springframework.data.mongodb.repository.Person;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
 /**
  * Unit tests for {@link AbstractMongoEventListener}.
@@ -71,7 +69,7 @@ public class AbstractMongoEventListenerUnitTests {
 	public void afterLoadEffectGetsHandledCorrectly() {
 
 		SamplePersonEventListener listener = new SamplePersonEventListener();
-		listener.onApplicationEvent(new AfterLoadEvent<Person>(new BasicDBObject(), Person.class, "collection-1"));
+		listener.onApplicationEvent(new AfterLoadEvent<Person>(new Document(), Person.class, "collection-1"));
 		assertThat(listener.invokedOnAfterLoad, is(true));
 	}
 
@@ -83,8 +81,8 @@ public class AbstractMongoEventListenerUnitTests {
 
 		SamplePersonEventListener personListener = new SamplePersonEventListener();
 		SampleAccountEventListener accountListener = new SampleAccountEventListener();
-		personListener.onApplicationEvent(new AfterLoadEvent<Person>(new BasicDBObject(), Person.class, "collection-1"));
-		accountListener.onApplicationEvent(new AfterLoadEvent<Person>(new BasicDBObject(), Person.class, "collection-1"));
+		personListener.onApplicationEvent(new AfterLoadEvent<Person>(new Document(), Person.class, "collection-1"));
+		accountListener.onApplicationEvent(new AfterLoadEvent<Person>(new Document(), Person.class, "collection-1"));
 
 		assertThat(personListener.invokedOnAfterLoad, is(true));
 		assertThat(accountListener.invokedOnAfterLoad, is(false));
@@ -98,8 +96,8 @@ public class AbstractMongoEventListenerUnitTests {
 
 		SamplePersonEventListener personListener = new SamplePersonEventListener();
 		SampleContactEventListener contactListener = new SampleContactEventListener();
-		personListener.onApplicationEvent(new AfterLoadEvent<Person>(new BasicDBObject(), Person.class, "collection-1"));
-		contactListener.onApplicationEvent(new AfterLoadEvent<Person>(new BasicDBObject(), Person.class, "collection-1"));
+		personListener.onApplicationEvent(new AfterLoadEvent<Person>(new Document(), Person.class, "collection-1"));
+		contactListener.onApplicationEvent(new AfterLoadEvent<Person>(new Document(), Person.class, "collection-1"));
 
 		assertThat(personListener.invokedOnAfterLoad, is(true));
 		assertThat(contactListener.invokedOnAfterLoad, is(true));
@@ -113,8 +111,8 @@ public class AbstractMongoEventListenerUnitTests {
 
 		SamplePersonEventListener personListener = new SamplePersonEventListener();
 		SampleContactEventListener contactListener = new SampleContactEventListener();
-		personListener.onApplicationEvent(new AfterLoadEvent<Contact>(new BasicDBObject(), Contact.class, "collection-1"));
-		contactListener.onApplicationEvent(new AfterLoadEvent<Contact>(new BasicDBObject(), Contact.class, "collection-1"));
+		personListener.onApplicationEvent(new AfterLoadEvent<Contact>(new Document(), Contact.class, "collection-1"));
+		contactListener.onApplicationEvent(new AfterLoadEvent<Contact>(new Document(), Contact.class, "collection-1"));
 
 		assertThat(personListener.invokedOnAfterLoad, is(false));
 		assertThat(contactListener.invokedOnAfterLoad, is(true));
@@ -128,7 +126,7 @@ public class AbstractMongoEventListenerUnitTests {
 	public void handlesUntypedImplementations() {
 
 		UntypedEventListener listener = new UntypedEventListener();
-		listener.onApplicationEvent(new MongoMappingEvent(new Object(), new BasicDBObject()));
+		listener.onApplicationEvent(new MongoMappingEvent(new Object(), new Document()));
 	}
 
 	/**
@@ -137,7 +135,7 @@ public class AbstractMongoEventListenerUnitTests {
 	@Test
 	public void invokeContactCallbackForPersonEvent() {
 
-		MongoMappingEvent<DBObject> event = new BeforeDeleteEvent<Person>(new BasicDBObject(), Person.class, "collection-1");
+		MongoMappingEvent<Document> event = new BeforeDeleteEvent<Person>(new Document(), Person.class, "collection-1");
 		SampleContactEventListener listener = new SampleContactEventListener();
 		listener.onApplicationEvent(event);
 
@@ -150,7 +148,7 @@ public class AbstractMongoEventListenerUnitTests {
 	@Test
 	public void invokePersonCallbackForPersonEvent() {
 
-		MongoMappingEvent<DBObject> event = new BeforeDeleteEvent<Person>(new BasicDBObject(), Person.class, "collection-1");
+		MongoMappingEvent<Document> event = new BeforeDeleteEvent<Person>(new Document(), Person.class, "collection-1");
 		SamplePersonEventListener listener = new SamplePersonEventListener();
 		listener.onApplicationEvent(event);
 
@@ -163,8 +161,7 @@ public class AbstractMongoEventListenerUnitTests {
 	@Test
 	public void dontInvokePersonCallbackForAccountEvent() {
 
-		MongoMappingEvent<DBObject> event = new BeforeDeleteEvent<Account>(new BasicDBObject(), Account.class,
-				"collection-1");
+		MongoMappingEvent<Document> event = new BeforeDeleteEvent<Account>(new Document(), Account.class, "collection-1");
 		SamplePersonEventListener listener = new SamplePersonEventListener();
 		listener.onApplicationEvent(event);
 
@@ -177,7 +174,7 @@ public class AbstractMongoEventListenerUnitTests {
 	@Test
 	public void donInvokePersonCallbackForUntypedEvent() {
 
-		MongoMappingEvent<DBObject> event = new BeforeDeleteEvent<Account>(new BasicDBObject(), null, "collection-1");
+		MongoMappingEvent<Document> event = new BeforeDeleteEvent<Account>(new Document(), null, "collection-1");
 		SamplePersonEventListener listener = new SamplePersonEventListener();
 		listener.onApplicationEvent(event);
 
@@ -197,17 +194,17 @@ public class AbstractMongoEventListenerUnitTests {
 		}
 
 		@Override
-		public void onAfterLoad(DBObject dbo) {
+		public void onAfterLoad(Document dbo) {
 			invokedOnAfterLoad = true;
 		}
 
 		@Override
-		public void onAfterDelete(DBObject dbo) {
+		public void onAfterDelete(Document dbo) {
 			invokedOnAfterDelete = true;
 		}
 
 		@Override
-		public void onBeforeDelete(DBObject dbo) {
+		public void onBeforeDelete(Document dbo) {
 			invokedOnBeforeDelete = true;
 		}
 	}
@@ -225,17 +222,17 @@ public class AbstractMongoEventListenerUnitTests {
 		}
 
 		@Override
-		public void onAfterLoad(DBObject dbo) {
+		public void onAfterLoad(Document dbo) {
 			invokedOnAfterLoad = true;
 		}
 
 		@Override
-		public void onAfterDelete(DBObject dbo) {
+		public void onAfterDelete(Document dbo) {
 			invokedOnAfterDelete = true;
 		}
 
 		@Override
-		public void onBeforeDelete(DBObject dbo) {
+		public void onBeforeDelete(Document dbo) {
 			invokedOnBeforeDelete = true;
 		}
 
@@ -252,7 +249,7 @@ public class AbstractMongoEventListenerUnitTests {
 		}
 
 		@Override
-		public void onAfterLoad(DBObject dbo) {
+		public void onAfterLoad(Document dbo) {
 			invokedOnAfterLoad = true;
 		}
 	}

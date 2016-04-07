@@ -33,7 +33,7 @@ import org.springframework.data.mongodb.core.convert.MongoConverters.StringToBig
 import org.springframework.data.mongodb.core.convert.MongoConverters.StringToCurrencyConverter;
 import org.springframework.data.mongodb.core.geo.Sphere;
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 /**
  * Unit tests for {@link MongoConverters}.
@@ -63,7 +63,7 @@ public class MongoConvertersUnitTests {
 
 		Box box = new Box(new Point(1, 2), new Point(3, 4));
 
-		DBObject dbo = GeoConverters.BoxToDbObjectConverter.INSTANCE.convert(box);
+		Document dbo = GeoConverters.BoxToDbObjectConverter.INSTANCE.convert(box);
 		Shape shape = GeoConverters.DbObjectToBoxConverter.INSTANCE.convert(dbo);
 
 		assertThat(shape, is((org.springframework.data.geo.Shape) box));
@@ -77,7 +77,7 @@ public class MongoConvertersUnitTests {
 
 		Circle circle = new Circle(new Point(1, 2), 3);
 
-		DBObject dbo = GeoConverters.CircleToDbObjectConverter.INSTANCE.convert(circle);
+		Document dbo = GeoConverters.CircleToDbObjectConverter.INSTANCE.convert(circle);
 		Shape shape = GeoConverters.DbObjectToCircleConverter.INSTANCE.convert(dbo);
 
 		assertThat(shape, is((org.springframework.data.geo.Shape) circle));
@@ -91,7 +91,7 @@ public class MongoConvertersUnitTests {
 
 		Polygon polygon = new Polygon(new Point(1, 2), new Point(2, 3), new Point(3, 4), new Point(5, 6));
 
-		DBObject dbo = GeoConverters.PolygonToDbObjectConverter.INSTANCE.convert(polygon);
+		Document dbo = GeoConverters.PolygonToDbObjectConverter.INSTANCE.convert(polygon);
 		Shape shape = GeoConverters.DbObjectToPolygonConverter.INSTANCE.convert(dbo);
 
 		assertThat(shape, is((org.springframework.data.geo.Shape) polygon));
@@ -105,7 +105,7 @@ public class MongoConvertersUnitTests {
 
 		Sphere sphere = new Sphere(new Point(1, 2), 3);
 
-		DBObject dbo = GeoConverters.SphereToDbObjectConverter.INSTANCE.convert(sphere);
+		Document dbo = GeoConverters.SphereToDbObjectConverter.INSTANCE.convert(sphere);
 		org.springframework.data.geo.Shape shape = GeoConverters.DbObjectToSphereConverter.INSTANCE.convert(dbo);
 
 		assertThat(shape, is((org.springframework.data.geo.Shape) sphere));
@@ -119,7 +119,7 @@ public class MongoConvertersUnitTests {
 
 		Point point = new Point(1, 2);
 
-		DBObject dbo = GeoConverters.PointToDbObjectConverter.INSTANCE.convert(point);
+		Document dbo = GeoConverters.PointToDbObjectConverter.INSTANCE.convert(point);
 		org.springframework.data.geo.Point converted = GeoConverters.DbObjectToPointConverter.INSTANCE.convert(dbo);
 
 		assertThat(converted, is((org.springframework.data.geo.Point) point));

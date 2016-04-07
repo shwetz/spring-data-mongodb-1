@@ -15,12 +15,11 @@
  */
 package org.springframework.data.mongodb.core.mapping.event;
 
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.GenericTypeResolver;
-
-import com.mongodb.DBObject;
 
 /**
  * Base class to implement domain class specific {@link ApplicationListener}s.
@@ -120,14 +119,14 @@ public abstract class AbstractMongoEventListener<E> implements ApplicationListen
 	}
 
 	/**
-	 * Captures source element and {@link com.mongodb.DBObject} representation before save.
+	 * Captures source element and {@link com.mongodb.Document} representation before save.
 	 * 
 	 * @param source will never be {@literal null}.
 	 * @param dbo can be {@literal null}.
 	 * @deprecated since 1.8. Please use {@link #onBeforeSave(BeforeSaveEvent)}.
 	 */
 	@Deprecated
-	public void onBeforeSave(E source, DBObject dbo) {
+	public void onBeforeSave(E source, Document dbo) {
 
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("onBeforeSave({}, {})", source, dbo);
@@ -141,18 +140,18 @@ public abstract class AbstractMongoEventListener<E> implements ApplicationListen
 	 * @since 1.8
 	 */
 	public void onBeforeSave(BeforeSaveEvent<E> event) {
-		onBeforeSave(event.getSource(), event.getDBObject());
+		onBeforeSave(event.getSource(), event.getDocument());
 	}
 
 	/**
-	 * Captures source element and {@link com.mongodb.DBObject} representation after save.
+	 * Captures source element and {@link com.mongodb.Document} representation after save.
 	 * 
 	 * @param source will never be {@literal null}.
 	 * @param dbo can be {@literal null}.
 	 * @deprecated since 1.8. Please use {@link #onAfterSave(AfterSaveEvent)}.
 	 */
 	@Deprecated
-	public void onAfterSave(E source, DBObject dbo) {
+	public void onAfterSave(E source, Document dbo) {
 
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("onAfterSave({}, {})", source, dbo);
@@ -166,17 +165,17 @@ public abstract class AbstractMongoEventListener<E> implements ApplicationListen
 	 * @since 1.8
 	 */
 	public void onAfterSave(AfterSaveEvent<E> event) {
-		onAfterSave(event.getSource(), event.getDBObject());
+		onAfterSave(event.getSource(), event.getDocument());
 	}
 
 	/**
-	 * Captures raw {@link com.mongodb.DBObject} when read from MongoDB.
+	 * Captures raw {@link com.mongodb.Document} when read from MongoDB.
 	 * 
 	 * @param dbo can be {@literal null}.
 	 * @deprecated since 1.8. Please use {@link #onAfterLoad(AfterLoadEvent)}.
 	 */
 	@Deprecated
-	public void onAfterLoad(DBObject dbo) {
+	public void onAfterLoad(Document dbo) {
 
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("onAfterLoad({})", dbo);
@@ -190,18 +189,18 @@ public abstract class AbstractMongoEventListener<E> implements ApplicationListen
 	 * @since 1.8
 	 */
 	public void onAfterLoad(AfterLoadEvent<E> event) {
-		onAfterLoad(event.getDBObject());
+		onAfterLoad(event.getDocument());
 	}
 
 	/**
-	 * Captures raw {@link com.mongodb.DBObject} and converted domain type after conversion.
+	 * Captures raw {@link com.mongodb.Document} and converted domain type after conversion.
 	 * 
 	 * @param dbo can be {@literal null}.
 	 * @param source will never be {@literal null}.
 	 * @deprecated since 1.8. Please use {@link #onAfterConvert(AfterConvertEvent)}.
 	 */
 	@Deprecated
-	public void onAfterConvert(DBObject dbo, E source) {
+	public void onAfterConvert(Document dbo, E source) {
 
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("onAfterConvert({}, {})", dbo, source);
@@ -215,18 +214,18 @@ public abstract class AbstractMongoEventListener<E> implements ApplicationListen
 	 * @since 1.8
 	 */
 	public void onAfterConvert(AfterConvertEvent<E> event) {
-		onAfterConvert(event.getDBObject(), event.getSource());
+		onAfterConvert(event.getDocument(), event.getSource());
 
 	}
 
 	/**
-	 * Captures {@link com.mongodb.DBObject} after delete.
+	 * Captures {@link com.mongodb.Document} after delete.
 	 * 
 	 * @param dbo can be {@literal null}.
 	 * @deprecated since 1.8. Please use {@link #onAfterDelete(AfterDeleteEvent)}.
 	 */
 	@Deprecated
-	public void onAfterDelete(DBObject dbo) {
+	public void onAfterDelete(Document dbo) {
 
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("onAfterDelete({})", dbo);
@@ -240,17 +239,17 @@ public abstract class AbstractMongoEventListener<E> implements ApplicationListen
 	 * @since 1.8
 	 */
 	public void onAfterDelete(AfterDeleteEvent<E> event) {
-		onAfterDelete(event.getDBObject());
+		onAfterDelete(event.getDocument());
 	}
 
 	/**
-	 * Capture {@link com.mongodb.DBObject} before delete.
+	 * Capture {@link com.mongodb.Document} before delete.
 	 * 
 	 * @param dbo can be {@literal null}.
 	 * @deprecated since 1.8. Please use {@link #onBeforeDelete(BeforeDeleteEvent)}.
 	 */
 	@Deprecated
-	public void onBeforeDelete(DBObject dbo) {
+	public void onBeforeDelete(Document dbo) {
 
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("onBeforeDelete({})", dbo);
@@ -264,6 +263,6 @@ public abstract class AbstractMongoEventListener<E> implements ApplicationListen
 	 * @since 1.8
 	 */
 	public void onBeforeDelete(BeforeDeleteEvent<E> event) {
-		onBeforeDelete(event.getDBObject());
+		onBeforeDelete(event.getDocument());
 	}
 }

@@ -20,11 +20,10 @@ import java.util.Set;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
-
-import com.mongodb.DBObject;
 
 /**
  * javax.validation dependant entities validator. When it is registered as Spring component its automatically invoked
@@ -50,11 +49,11 @@ public class ValidatingMongoEventListener extends AbstractMongoEventListener<Obj
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener#onBeforeSave(java.lang.Object, com.mongodb.DBObject)
+	 * @see org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener#onBeforeSave(java.lang.Object, com.mongodb.Document)
 	 */
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void onBeforeSave(Object source, DBObject dbo) {
+	public void onBeforeSave(Object source, Document dbo) {
 
 		LOG.debug("Validating object: {}", source);
 		Set violations = validator.validate(source);

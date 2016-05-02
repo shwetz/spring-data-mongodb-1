@@ -42,6 +42,7 @@ import org.springframework.util.Assert;
  * @author Oliver Gierke
  * @author Mark Paluch
  * @author Alessio Fachechi
+ * @author Christoph Strobl
  * @since 1.3
  */
 public class Aggregation {
@@ -207,7 +208,7 @@ public class Aggregation {
 	 * @param field must not be {@literal null} or empty.
 	 * @param preserveNullAndEmptyArrays {@literal true} to output the document if path is {@literal null}, missing or
 	 *          array is empty.
-	 * @return
+	 * @return new {@link UnwindOperation}
 	 * @since 1.10
 	 */
 	public static UnwindOperation unwind(String field, boolean preserveNullAndEmptyArrays) {
@@ -215,12 +216,13 @@ public class Aggregation {
 	}
 
 	/**
-	 * Factory method to create a new {@link UnwindOperation} for the field with the given name and to include the index
-	 * field as {@code arrayIndex}. Note that extended unwind is supported in MongoDB version 3.2+.
+	 * Factory method to create a new {@link UnwindOperation} for the field with the given name including the name of a
+	 * new field to hold the array index of the element as {@code arrayIndex}. Note that extended unwind is supported in
+	 * MongoDB version 3.2+.
 	 *
 	 * @param field must not be {@literal null} or empty.
 	 * @param arrayIndex must not be {@literal null} or empty.
-	 * @return
+	 * @return new {@link UnwindOperation}
 	 * @since 1.10
 	 */
 	public static UnwindOperation unwind(String field, String arrayIndex) {
@@ -228,15 +230,15 @@ public class Aggregation {
 	}
 
 	/**
-	 * Factory method to create a new {@link UnwindOperation} for the field with the given name, to include the index
-	 * field as {@code arrayIndex} and {@code preserveNullAndEmptyArrays}. Note that extended unwind is supported in
-	 * MongoDB version 3.2+.
+	 * Factory method to create a new {@link UnwindOperation} for the field with the given nameincluding the name of a new
+	 * field to hold the array index of the element as {@code arrayIndex} using {@code preserveNullAndEmptyArrays}. Note
+	 * that extended unwind is supported in MongoDB version 3.2+.
 	 *
 	 * @param field must not be {@literal null} or empty.
 	 * @param arrayIndex must not be {@literal null} or empty.
 	 * @param preserveNullAndEmptyArrays {@literal true} to output the document if path is {@literal null}, missing or
 	 *          array is empty.
-	 * @return
+	 * @return new {@link UnwindOperation}
 	 * @since 1.10
 	 */
 	public static UnwindOperation unwind(String field, String arrayIndex, boolean preserveNullAndEmptyArrays) {

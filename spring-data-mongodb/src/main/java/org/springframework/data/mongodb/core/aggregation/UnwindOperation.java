@@ -29,6 +29,7 @@ import org.springframework.util.Assert;
  * @author Thomas Darimont
  * @author Oliver Gierke
  * @author Mark Paluch
+ * @author Christoph Strobl
  * @since 1.3
  */
 public class UnwindOperation
@@ -40,7 +41,7 @@ public class UnwindOperation
 
 	/**
 	 * Creates a new {@link UnwindOperation} for the given {@link Field}.
-	 * 
+	 *
 	 * @param field must not be {@literal null}.
 	 */
 	public UnwindOperation(Field field) {
@@ -49,7 +50,7 @@ public class UnwindOperation
 
 	/**
 	 * Creates a new {@link UnwindOperation} using Mongo 3.2 syntax.
-	 * 
+	 *
 	 * @param field must not be {@literal null}.
 	 * @param preserveNullAndEmptyArrays {@literal true} to output the document if path is {@literal null}, missing or
 	 *          array is empty.
@@ -65,7 +66,7 @@ public class UnwindOperation
 
 	/**
 	 * Creates a new {@link UnwindOperation} using Mongo 3.2 syntax.
-	 * 
+	 *
 	 * @param field must not be {@literal null}.
 	 * @param arrayIndex optional field name to expose the field array index, must not be {@literal null}.
 	 * @param preserveNullAndEmptyArrays {@literal true} to output the document if path is {@literal null}, missing or
@@ -89,26 +90,26 @@ public class UnwindOperation
 	@Override
 	public Document toDocument(AggregationOperationContext context) {
 
-		String unwindField = context.getReference(field).toString();
-		Object unwindArg;
+		String path = context.getReference(field).toString();
 
-		if (preserveNullAndEmptyArrays || arrayIndex != null) {
-
-			Document builder = new Document().append("path", unwindField);
-			builder = builder.append("preserveNullAndEmptyArrays", preserveNullAndEmptyArrays);
-
-			if (arrayIndex != null) {
-				builder = builder.append("includeArrayIndex", arrayIndex.getName());
-			}
-
-			unwindArg = builder;
-		} else {
-			unwindArg = unwindField;
+		if (!preserveNullAndEmptyArrays && arrayIndex == null) {
+			return new Document("$unwind", path);
 		}
 
-		return new Document("$unwind", unwindArg);
+		Document unwindArgs = new Document();
+		unwindArgs.put("path", path);
+		if (arrayIndex != null) {
+			unwindArgs.put("includeArrayIndex", arrayIndex.getName());
+		}
+		unwindArgs.put("preserveNullAndEmptyArrays", preserveNullAndEmptyArrays);
+
+		return new Document("$unwind", unwindArgs);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.data.mongodb.core.aggregation.FieldsExposingAggregationOperation#getFields()
+	 */
 	@Override
 	public ExposedFields getFields() {
 		return arrayIndex != null ? ExposedFields.from(arrayIndex) : ExposedFields.from();
@@ -118,11 +119,16 @@ public class UnwindOperation
 	 * Get a builder that allows creation of {@link LookupOperation}.
 	 *
 	 * @return
+	 * @since 1.10
 	 */
 	public static PathBuilder newUnwind() {
 		return UnwindOperationBuilder.newBuilder();
 	}
 
+	/**
+	 * @author Mark Paluch
+	 * @since 1.10
+	 */
 	public static interface PathBuilder {
 
 		/**
@@ -132,11 +138,15 @@ public class UnwindOperation
 		IndexBuilder path(String path);
 	}
 
+	/**
+	 * @author Mark Paluch
+	 * @since 1.10
+	 */
 	public static interface IndexBuilder {
 
 		/**
 		 * Exposes the array index as {@code field}.
-		 * 
+		 *
 		 * @param field field name to expose the field array index, must not be {@literal null} or empty.
 		 * @return
 		 */
@@ -144,7 +154,7 @@ public class UnwindOperation
 
 		/**
 		 * Do not expose the array index.
-		 * 
+		 *
 		 * @return
 		 */
 		EmptyArraysBuilder noArrayIndex();
@@ -154,14 +164,14 @@ public class UnwindOperation
 
 		/**
 		 * Output documents if the array is null or empty.
-		 * 
+		 *
 		 * @return
 		 */
 		UnwindOperation preserveNullAndEmptyArrays();
 
 		/**
 		 * Do not output documents if the array is null or empty.
-		 * 
+		 *
 		 * @return
 		 */
 		UnwindOperation skipNullAndEmptyArrays();
@@ -189,6 +199,10 @@ public class UnwindOperation
 			return new UnwindOperationBuilder();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.springframework.data.mongodb.core.aggregation.UnwindOperation.EmptyArraysBuilder#preserveNullAndEmptyArrays()
+		 */
 		@Override
 		public UnwindOperation preserveNullAndEmptyArrays() {
 
@@ -199,6 +213,10 @@ public class UnwindOperation
 			return new UnwindOperation(field, true);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.springframework.data.mongodb.core.aggregation.UnwindOperation.EmptyArraysBuilder#skipNullAndEmptyArrays()
+		 */
 		@Override
 		public UnwindOperation skipNullAndEmptyArrays() {
 
@@ -209,26 +227,39 @@ public class UnwindOperation
 			return new UnwindOperation(field, false);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.springframework.data.mongodb.core.aggregation.UnwindOperation.IndexBuilder#arrayIndex(java.lang.String)
+		 */
 		@Override
 		public EmptyArraysBuilder arrayIndex(String field) {
+
 			Assert.hasText(field, "'ArrayIndex' must not be null or empty!");
 			arrayIndex = Fields.field(field);
 			return this;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.springframework.data.mongodb.core.aggregation.UnwindOperation.IndexBuilder#noArrayIndex()
+		 */
 		@Override
 		public EmptyArraysBuilder noArrayIndex() {
+
 			arrayIndex = null;
 			return this;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.springframework.data.mongodb.core.aggregation.UnwindOperation.PathBuilder#path(java.lang.String)
+		 */
 		@Override
 		public UnwindOperationBuilder path(String path) {
+
 			Assert.hasText(path, "'Path' must not be null or empty!");
 			field = Fields.field(path);
 			return this;
 		}
-
 	}
-
 }

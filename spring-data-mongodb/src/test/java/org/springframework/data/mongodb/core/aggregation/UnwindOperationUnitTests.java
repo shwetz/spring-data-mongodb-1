@@ -25,8 +25,9 @@ import org.springframework.data.mongodb.core.DBObjectTestUtils;
 
 /**
  * Unit tests for {@link UnwindOperation}.
- * 
+ *
  * @author Mark Paluch
+ * @author Christoph Strobl
  */
 public class UnwindOperationUnitTests {
 
@@ -123,7 +124,7 @@ public class UnwindOperationUnitTests {
 		assertThat(unwindClause,
 				isBsonObject().containing("path", "$foo").//
 						containing("preserveNullAndEmptyArrays", true).//
-						notContaining("myindex"));
+						containing("includeArrayIndex", "myindex"));
 	}
 
 	private Document extractDbObjectFromUnwindOperation(UnwindOperation unwindOperation) {

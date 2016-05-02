@@ -244,6 +244,8 @@ public class AggregationTests {
 	@Test
 	public void shouldUnwindWithIndex() {
 
+		assumeTrue(mongoVersion.isGreaterThanOrEqualTo(THREE_DOT_TWO));
+
 		MongoCollection<Document> coll = mongoTemplate.getCollection(INPUT_COLLECTION);
 
 		coll.insertOne(createDocument("Doc1", "spring", "mongodb", "nosql"));
@@ -272,6 +274,8 @@ public class AggregationTests {
 	 */
 	@Test
 	public void shouldUnwindPreserveEmpty() {
+
+		assumeTrue(mongoVersion.isGreaterThanOrEqualTo(THREE_DOT_TWO));
 
 		MongoCollection<Document> coll = mongoTemplate.getCollection(INPUT_COLLECTION);
 
